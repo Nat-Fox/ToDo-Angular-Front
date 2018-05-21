@@ -1,5 +1,6 @@
 import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
+import Task from './Task';
 // import { Observable } from 'rxjs';
 
 @Component({
@@ -9,7 +10,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 
 export class AppComponent {
-  tasks: string[] = [];
+  tasks: Task[] = [];
   // desde ngModel
   taskValue = '';
   url = 'http://localhost:8080';
@@ -18,23 +19,10 @@ export class AppComponent {
     public http: HttpClient
   ) {
     this.getTasks();
-    // this.getTasks().subscribe(result => {
-    //   console.log(result);
-    //   this.tasks = result;
-    // },
-    //   error => {
-    //     console.log(<any>error);
-    //   }
-    // );
   }
 
-  // llamada al servidor
-  // getTasks (): Observable<any> {
-  //   return this.http.get(this.url + '/api/todos');
-  // }
-
   getTasks() {
-    this.http.get(this.url + '/api/todos').subscribe((result: any) => {
+    this.http.get(this.url + '/api/todos').subscribe((result: Task[]) => {
       this.tasks = result;
     }, error => {
       console.log(error);
@@ -42,8 +30,15 @@ export class AppComponent {
   }
 
   addTask() {
-    // valor del input -> this.taskValue
-    this.tasks.push(this.taskValue);
-    this.taskValue = '';
+    this.postTask({
+      name: this.taskValue
+    });
+  }
+
+  postTask(task: Task) {
+    this.http.post(this.url + '/api/todos', task).subscribe((responseTask: Task) => {
+      this.tasks.push(responseTask);
+      this.taskValue = '';
+    });
   }
 }
